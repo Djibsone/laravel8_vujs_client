@@ -1,7 +1,10 @@
-
 <template>
+
 <!-- component -->
 <div class="-my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 pr-10 lg:px-8">
+    <div v-if="errors != ''">
+        {{errors}}
+    </div>
     <div class="align-middle rounded-tl-lg rounded-tr-lg inline-block w-full py-4 overflow-hidden bg-white shadow-lg px-12">
         <div class="flex justify-between">
             <div class="inline-flex border rounded w-7/12 px-2 lg:px-6 h-12 bg-transparent">
@@ -20,46 +23,32 @@
         </div>
     </div>
     <div class="flex flex-col-md-6 mt-3 mb-2">
-        <!-- <router-link :to="{ name: 'customers.create' }" class="bg-green-500 px-2 py-1 text-dark rounded">Créer un client</router-link> -->
-        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Créer un client</button>
+        <router-link :to="{ name: 'customers.create' }" class="btn btn-outline-success">Créer un client</router-link>
+        <!-- <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#exampleModal">Créer un client</button> -->
     </div>
     <div class="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-3 rounded-bl-lg rounded-br-lg">
         <table class="table-auto w-full">
         <thead>
             <tr>
-            <!-- <th class="px-6 py-3 border-b-2 border-gray-300 text-left leading-4 text-blue-500 tracking-wider">N°</th> -->
             <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 text-blue-500 tracking-wider">Nom</th>
             <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 text-blue-500 tracking-wider">Téléphone</th>
             <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 text-blue-500 tracking-wider">Is_Favorite</th>
-            <!-- <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 text-blue-500 tracking-wider">Status</th>
-            <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 text-blue-500 tracking-wider">Created At</th>
-            <th class="px-6 py-3 border-b-2 border-gray-300"></th> -->
+            <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 text-blue-500 tracking-wider" colspan="2">Action</th>
             </tr>
         </thead>
             <tbody class="bg-white" v-if="customers.length > 0">
             <tr v-for="customer in customers" :key="customer.id">
-                <!-- <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-500">
-                <div class="flex items-center">
-                    <div>
-                    <div class="text-sm leading-5 text-gray-800">{{ i+=1 }}</div>
-                    </div>
-                </div>
-                </td> -->
                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-500">
-                <div class="text-sm leading-5 text-blue-900">{{ customer.name }}</div>
+                    <div class="text-sm leading-5 text-blue-900">{{ customer.name }}</div>
                 </td>
                 <td class="px-6 py-4 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{{ customer.tel }}</td>
                 <td class="px-6 py-4 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">{{ customer.is_favorite }}</td>
-                <!-- <td class="px-6 py-4 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">
-                <span class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
-                    <span aria-hidden class="absolute inset-0 bg-green-200 opacity-50 rounded-full"></span>
-                    <span class="relative text-xs">active</span>
-                </span>
+                <td class="px-6 py-4 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5">
+                    <span class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
+                        <router-link :to="{ name: 'customers.edit', params: { id: customer.id } }" class="btn btn-outline-warning mr-2">Editer</router-link>
+                        <button @click="deleteCustomer(customer.id)" class="btn btn-outline-danger">Delete</button>
+                    </span>
                 </td>
-                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-500 text-blue-900 text-sm leading-5">September 12</td>
-                <td class="px-6 py-4 whitespace-no-wrap text-right border-b border-gray-500 text-sm leading-5">
-                <button class="px-5 py-2 border-blue-500 border text-blue-500 rounded transition duration-300 hover:bg-blue-700 hover:text-white focus:outline-none">View Details</button>
-                </td> -->
             </tr>
             </tbody>
             <tbody v-else>
@@ -69,10 +58,13 @@
     </div>
 </div>
 
-<!-- modal start -->
+<!-- modal cerate start -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
+        <div v-if="errors != ''">
+            {{ errors }}
+        </div>
         <form @submit.prevent="storeCustomer">
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="exampleModalLabel">Créer client</h1>
@@ -82,11 +74,11 @@
                 
                 <div class="mb-3">
                     <label for="name" class="col-form-label">Nom:</label>
-                    <input type="text" class="form-control border rounded" id="name" v-model="form.name" required>
+                    <input type="text" class="form-control border rounded" id="name" v-model="form.name">
                 </div>
                 <div class="mb-3">
                     <label for="tel" class="col-form-label">Téléphone:</label>
-                    <input type="text" class="form-control border rounded" id="tel" v-model="form.tel" required>
+                    <input type="text" class="form-control border rounded" id="tel" v-model="form.tel">
                 </div>
                 <div class="mb-3">
                     <label for="is_favorite" class="col-form-label">Favori ?</label>
@@ -115,7 +107,13 @@ import useCustomers from '../services/customerservices';
 export default {
   setup() {
    
-    const { customers, getCustomers }  = useCustomers();
+    const { customers, getCustomers, destroyCustomer }  = useCustomers();
+    
+    const deleteCustomer = async (id) => {
+        await destroyCustomer(id);
+    };
+
+
     onMounted(getCustomers);
 
     const form = reactive({
@@ -124,19 +122,19 @@ export default {
        is_favorite: ''
     });
 
-    const { createCustomer }  = useCustomers();
+    const { createCustomer, errors }  = useCustomers();
 
     const storeCustomer = async () => {
         await createCustomer({...form});
-        //rouier.push({ name: 'customers.index'});
-        //$('#exampleModal').modal('hide');
         window.location.reload();
     };
     
     return {
       customers,
       form,
-      storeCustomer
+      errors,
+      storeCustomer,
+      deleteCustomer
     };
   }
 };
