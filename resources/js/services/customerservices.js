@@ -1,5 +1,6 @@
 import { ref } from 'vue';
 import axios from "axios";
+import router from '../router/index'
 
 
 export default function useCustomers() {
@@ -21,9 +22,10 @@ export default function useCustomers() {
         errors.value = '';
         try {
             await axios.post('/api/customers', data);
+            await router.push({ name: 'customers.index'});
         } catch (error) {
-           const createCustomersErrors  = error.data.error;
-
+           const createCustomersErrors  = error.response.data.errors;
+           
            for ( const key in createCustomersErrors ){
             errors.value += createCustomersErrors[key][0]+' ';
            }
@@ -34,8 +36,9 @@ export default function useCustomers() {
         errors.value = '';
         try {
             await axios.put('/api/customers/' + id, customer.value);
+            await router.push({ name: 'customers.index'});
         } catch (error) {
-           const createCustomersErrors  = error.data.error;
+           const createCustomersErrors  = error.response.data.errors;
 
            for ( const key in createCustomersErrors ){
             errors.value += createCustomersErrors[key][0]+' ';
@@ -44,7 +47,7 @@ export default function useCustomers() {
     };
 
     const destroyCustomer = async (id) => {
-        if (window.confirm('Supprimer ce client ?')) return;
+        if (!window.confirm('Supprimer ce client ?')) return;
 
         await axios.delete('/api/customers/' + id);
         await getCustomers();

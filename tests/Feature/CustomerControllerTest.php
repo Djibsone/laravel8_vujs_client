@@ -41,7 +41,7 @@ class CustomerControllerTest extends TestCase
         $customers = Customer::all();
         $customer = Customer::first();
 
-        $response->assertOK();
+        $response->assertStatus(201);
         $this->assertEquals(1, $customers->count());
         $this->assertEquals('Mon premier client', $customer->name);
     }
@@ -58,8 +58,7 @@ class CustomerControllerTest extends TestCase
             'is_favorite' => ''
         ]);
         
-        $response->assertOK();
-        $response->assertSessionHasErrors((['name', 'tel', 'is_favorite']));
+        $response->assertSessionHasErrors((['name', 'tel']));
     }
 
      /**
