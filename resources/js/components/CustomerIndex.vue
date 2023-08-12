@@ -2,9 +2,6 @@
 
 <!-- component -->
 <div class="-my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 pr-10 lg:px-8">
-    <div v-if="errors != ''">
-        {{errors}}
-    </div>
     <div class="align-middle rounded-tl-lg rounded-tr-lg inline-block w-full py-4 overflow-hidden bg-white shadow-lg px-12">
         <div class="flex justify-between">
             <div class="inline-flex border rounded w-7/12 px-2 lg:px-6 h-12 bg-transparent">
@@ -23,8 +20,8 @@
         </div>
     </div>
     <div class="flex flex-col-md-6 mt-3 mb-2">
-        <router-link :to="{ name: 'customers.create' }" class="btn btn-outline-success">Créer un client</router-link>
-        <!-- <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#exampleModal">Créer un client</button> -->
+        <!-- <router-link :to="{ name: 'customers.create' }" class="btn btn-outline-success">Créer un client</router-link> -->
+        <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#exampleModal">Créer un client</button>
     </div>
     <div class="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-3 rounded-bl-lg rounded-br-lg">
         <table class="table-auto w-full">
@@ -62,7 +59,7 @@
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
-        <div v-if="errors != ''">
+        <div v-if="errors != ''" class="m-2 p-2 fw-bold text-center text-white bg-danger rounded">
             {{ errors }}
         </div>
         <form @submit.prevent="storeCustomer">
