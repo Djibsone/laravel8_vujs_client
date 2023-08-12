@@ -22,7 +22,8 @@ export default function useCustomers() {
         errors.value = '';
         try {
             await axios.post('/api/customers', data);
-            await router.push({ name: 'customers.index'});
+            const success = 'Client créé avec succès !';
+            await router.push({ name: 'customers.index', query: { success: success } });
         } catch (error) {
            const createCustomersErrors  = error.response.data.errors;
            
@@ -36,7 +37,8 @@ export default function useCustomers() {
         errors.value = '';
         try {
             await axios.put('/api/customers/' + id, customer.value);
-            await router.push({ name: 'customers.index'});
+            const success = 'Client modifié avec succès !';
+            await router.push({ name: 'customers.index', query: { success: success } });
         } catch (error) {
            const createCustomersErrors  = error.response.data.errors;
 

@@ -1,5 +1,7 @@
 <template>
-
+<div v-if="success">
+    <p class="m-2 p-2 fw-bold text-center text-white bg-success rounded">{{ success }}</p>
+</div>
 <!-- component -->
 <div class="-my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 pr-10 lg:px-8">
     <div class="align-middle rounded-tl-lg rounded-tr-lg inline-block w-full py-4 overflow-hidden bg-white shadow-lg px-12">
@@ -20,8 +22,8 @@
         </div>
     </div>
     <div class="flex flex-col-md-6 mt-3 mb-2">
-        <!-- <router-link :to="{ name: 'customers.create' }" class="btn btn-outline-success">Créer un client</router-link> -->
-        <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#exampleModal">Créer un client</button>
+        <router-link :to="{ name: 'customers.create' }" class="btn btn-outline-success">Créer un client</router-link>
+        <!-- <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#exampleModal">Créer un client</button> -->
     </div>
     <div class="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-3 rounded-bl-lg rounded-br-lg">
         <table class="table-auto w-full">
@@ -98,20 +100,32 @@
 
 
 <script>
-import { onMounted, reactive } from 'vue';
+import { ref, onMounted, reactive } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import useCustomers from '../services/customerservices';
 
 export default {
-  setup() {
-   
+  setup() {   
     const { customers, getCustomers, destroyCustomer }  = useCustomers();
-    
+    const route = useRoute();
+    const router = useRouter();
+
+    const success = ref(route.query.success || '');
+
     const deleteCustomer = async (id) => {
         await destroyCustomer(id);
+        success.value = 'Client supprimé avec succès !';
     };
 
+  
+    onMounted(async () => {
+      // Récupérer la liste des clients dès le chargement de la page
+      await getCustomers();
 
-    onMounted(getCustomers);
+      // Supprimer le message de succès des paramètres d'URL après l'actualisation
+      router.replace({ query: { ...route.query, success: null } });
+    });
+
 
     const form = reactive({
        name: '', 
@@ -125,10 +139,11 @@ export default {
         await createCustomer({...form});
         window.location.reload();
     };
-    
+
     return {
       customers,
       form,
+      success,
       errors,
       storeCustomer,
       deleteCustomer
