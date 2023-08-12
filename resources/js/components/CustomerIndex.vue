@@ -17,10 +17,16 @@
                             </svg>
                         </span>
                     </div>
-                    <input type="text" class="flex-shrink flex-grow flex-auto leading-normal tracking-wide w-px flex-1 border border-none border-l-0 rounded rounded-l-none px-3 relative focus:outline-none text-xxs lg:text-xs lg:text-base text-gray-500 font-thin" placeholder="Search">
+                    <input type="text" v-model="q" class="flex-shrink flex-grow flex-auto leading-normal tracking-wide w-px flex-1 border border-none border-l-0 rounded rounded-l-none px-3 relative focus:outline-none text-xxs lg:text-xs lg:text-base text-gray-500 font-thin" placeholder="Search">
                 </div>
             </div>
         </div>
+    </div>
+    <div class="alert alert-secondary fw-bold" v-if="this.q && getFilteredCustomers.length > 0">
+        {{ getFilteredCustomers.length }} Client<span v-if="getFilteredCustomers.length > 1">s</span> trouvé<span v-if="getFilteredCustomers.length > 1">s</span>
+    </div>
+    <div class="alert alert-secondary fw-bold" v-if="this.q && getFilteredCustomers.length == 0">
+        Aucun client trouvé !
     </div>
     <div class="flex flex-col-md-6 mt-3 mb-2">
         <router-link :to="{ name: 'customers.create' }" class="btn btn-outline-success">Créer un client</router-link>
@@ -37,7 +43,7 @@
             </tr>
         </thead>
             <tbody class="bg-white" v-if="customers.length > 0">
-            <tr v-for="customer in customers" :key="customer.id">
+            <tr v-for="customer in getFilteredCustomers" :key="customer.id">
                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-500">
                     <div class="text-sm leading-5 text-blue-900">{{ customer.name }}</div>
                 </td>
@@ -101,11 +107,17 @@
 
 
 <script>
-import { ref, onMounted, reactive } from 'vue';
+import { ref, onMounted, reactive, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import useCustomers from '../services/customerservices';
 
 export default {
+  data() {
+    return {
+        q: ''
+    }
+  },
+
   setup() {   
     const { customers, getCustomers, destroyCustomer }  = useCustomers();
     const route = useRoute();
@@ -149,6 +161,14 @@ export default {
       storeCustomer,
       deleteCustomer
     };
+  },
+
+  computed: {
+  getFilteredCustomers() {
+    return this.customers.filter(customer => {
+      return customer.name.toLowerCase().includes(this.q.toLowerCase()); // Utilisez "this.customers" au lieu de "customers"
+    });
   }
+}
 };
 </script>
